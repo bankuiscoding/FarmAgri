@@ -1,0 +1,95 @@
+CREATE DATABASE IF NOT EXISTS PRODUCTMANAGEMENT;
+CREATE DATABASE IF NOT EXISTS USER;
+
+USE PRODUCTMANAGEMENT;
+
+CREATE TABLE IF NOT EXISTS categories (
+  category_id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(120) NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS products (
+  product_id INT AUTO_INCREMENT PRIMARY KEY,
+  category_id INT NOT NULL,
+  name VARCHAR(160) NOT NULL,
+  description TEXT,
+  image_url VARCHAR(1000),
+  price_range VARCHAR(100) NOT NULL,
+  farmer_name VARCHAR(160) NOT NULL,
+  farmer_mobile VARCHAR(30),
+  unit_type VARCHAR(40) NOT NULL,
+  harvest_date VARCHAR(40),
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_products_category FOREIGN KEY (category_id) REFERENCES categories(category_id)
+);
+
+CREATE TABLE IF NOT EXISTS product_varieties (
+  variety_id INT AUTO_INCREMENT PRIMARY KEY,
+  product_id INT NOT NULL,
+  group_label VARCHAR(120),
+  variety_name VARCHAR(160) NOT NULL,
+  CONSTRAINT fk_varieties_product FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS add_to_cart (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  product_id INT NOT NULL,
+  product_name VARCHAR(160) NOT NULL,
+  price INT NOT NULL,
+  quantity INT NOT NULL DEFAULT 1,
+  image_url VARCHAR(1000),
+  added_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS orders (
+  order_id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(120) NOT NULL,
+  total_amount INT NOT NULL,
+  shipping_address VARCHAR(500) NOT NULL,
+  payment_method VARCHAR(50) NOT NULL,
+  status VARCHAR(50) NOT NULL DEFAULT 'Order Placed',
+  razorpay_order_id VARCHAR(120),
+  order_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS order_items (
+  item_id INT AUTO_INCREMENT PRIMARY KEY,
+  order_id INT NOT NULL,
+  product_name VARCHAR(160) NOT NULL,
+  seller_username VARCHAR(120) NOT NULL,
+  buyer_username VARCHAR(120) NOT NULL,
+  quantity INT NOT NULL,
+  price_per_unit INT NOT NULL,
+  status VARCHAR(50) NOT NULL DEFAULT 'Pending',
+  CONSTRAINT fk_order_items_order FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE
+);
+
+USE USER;
+
+CREATE TABLE IF NOT EXISTS users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(120) NOT NULL UNIQUE,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  status VARCHAR(30) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS wishlist (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(120) NOT NULL,
+  product_name VARCHAR(160) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_wishlist_user_product (username, product_name)
+);
+
+CREATE TABLE IF NOT EXISTS activation_token (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(120) NOT NULL,
+  activation_token VARCHAR(255),
+  status VARCHAR(30),
+  activation_expiry TIMESTAMP NULL,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  new_password VARCHAR(255)
+);
