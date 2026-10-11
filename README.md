@@ -36,6 +36,4 @@ Health is available at `GET /actuator/health`. The API defaults to port `8085`. 
 
 The `Dockerfile` can be deployed to Render, Railway, Fly.io, or another container host. Provision managed MySQL, configure every value from `.env.example` in the host's secret manager, set `CORS_ALLOWED_ORIGINS` to the frontend domain, and deploy the container. Never commit `.env` or real credentials.
 
-## Security note
 
-Credentials previously committed to Git history must be revoked and rotated before making this repository public. Removing them from current source does not remove them from earlier commits.
